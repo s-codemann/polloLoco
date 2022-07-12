@@ -1,8 +1,7 @@
 class World {
   character = new Character();
 
-  level = level0;
-  enemies;
+  enemies = [new Chicken(), new Chicken(), new Chicken()];
   canvas;
   ctx;
   clouds = new Clouds();
@@ -11,7 +10,11 @@ class World {
   coinbar = new Coinbar();
   fixedBackground = [new FullBackground("./img/5_background/layers/air.png")];
   camera_x = -5;
-  background;
+  background = [
+    new Background("./img/5_background/layers/3_third_layer/1.png"),
+    new Background("img/5_background/layers/2_second_layer/1.png"),
+    new Background("img/5_background/layers/1_first_layer/1.png"),
+  ];
   coins = [
     new Coin(),
     new Coin(),
@@ -38,17 +41,11 @@ class World {
     // this.enemies = enemies;
     // this.clouds = clouds;
     this.character.world = this;
-    this.setLevel();
     this.checkforCollisionElements = this.enemies.concat(this.coins);
     this.checkCollision();
     this.draw();
   }
-  // setLevel(level) {
 
-  //   this.level = level;
-  //   this.enemies = this.level.enemies;
-  //   this.background = this.level.background;
-  // }
   //checkforCollisionElements = this.enemies.concat(this.coins);
   isColliding = () => {
     this.checkforCollisionElements.forEach((obj, i) => {
