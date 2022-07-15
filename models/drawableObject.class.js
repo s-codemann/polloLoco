@@ -32,7 +32,9 @@ class DrawableObject {
         arr.findIndex((el) => el.id === id),
         1
       );
-      world.checkforCollisionElements = world.enemies.concat(world.coins);
+      world.checkforCollisionElements = world.enemies
+        .concat(world.coins)
+        .concat(world.bottles);
     } else return;
   };
 }

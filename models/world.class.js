@@ -2,17 +2,36 @@ class World {
   character = new Character();
 
   level = level0;
-  enemies;
+  enemies = this.level.enemies;
   canvas;
   ctx;
   clouds = new Clouds();
   healthbar = new Healthbar();
   bottlebar = new Bottlebar();
   coinbar = new Coinbar();
+  thrownbottle;
+  stopBottle = false;
   fixedBackground = [new FullBackground("./img/5_background/layers/air.png")];
   camera_x = -5;
-  background;
+  background = this.level.background;
+  bottles = [
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+    new Bottle(),
+  ];
   coins = [
+    new Coin(),
     new Coin(),
     new Coin(),
     new Coin(),
@@ -37,19 +56,24 @@ class World {
     // this.character = character;
     // this.enemies = enemies;
     // this.clouds = clouds;
+    this.setLevel(level1);
+    this.setLevel(level2);
     this.character.world = this;
-    this.setLevel();
-    this.checkforCollisionElements = this.enemies.concat(this.coins);
+
+    this.checkforCollisionElements = this.enemies
+      .concat(this.coins)
+      .concat(this.bottles);
     this.checkCollision();
     this.draw();
   }
-  // setLevel(level) {
-
-  //   this.level = level;
-  //   this.enemies = this.level.enemies;
-  //   this.background = this.level.background;
-  // }
-  //checkforCollisionElements = this.enemies.concat(this.coins);
+  setLevel = (level) => {
+    this.level = level;
+    this.enemies = this.enemies.concat(this.level.enemies);
+    this.background = this.background.concat(this.level.background);
+  };
+  // checkforCollisionElements = this.enemies
+  //   .concat(this.coins)
+  //   .concat(this.bottles);
   isColliding = () => {
     this.checkforCollisionElements.forEach((obj, i) => {
       if (
@@ -80,12 +104,25 @@ class World {
         // console.log(obj instanceof Chicken);
         // console.log(obj instanceof Chicken, obj instanceof Coin);
         this.character.collidingWith = obj;
-        console.log(this.checkforCollisionElements.length);
       }
+
       // else {
       //   setTimeout(() => (this.character.collidingWith = null)), 50;
       // }
     });
+    if (this.thrownBottle) {
+      this.enemies.forEach((enemy) => {
+        if (
+          enemy.pos_x + enemy.width > this.thrownBottle.pos_x &&
+          enemy.pos_y + enemy.height > this.thrownBottle.pos_y &&
+          enemy.pos_x < this.thrownBottle.pos_x &&
+          enemy.pos_y < this.thrownBottle.pos_y + this.thrownBottle.height
+        ) {
+          enemy.die();
+          this.stopBottle = true;
+        }
+      });
+    }
   };
   checkCollision = () => {
     setInterval(this.isColliding, 1000 / 60);
@@ -123,6 +160,7 @@ class World {
     // });
     //clouds
     this.addMultiple(this.coins);
+    this.addMultiple(this.bottles);
     this.ctx.drawImage(
       this.clouds.img,
       this.clouds.pos_x,
@@ -130,6 +168,10 @@ class World {
       this.clouds.width,
       this.clouds.height
     );
+
+    if (this.thrownBottle) {
+      this.addToMap(this.thrownBottle);
+    }
     this.ctx.translate(-this.camera_x, 0);
     let self = this;
     requestAnimationFrame(function () {

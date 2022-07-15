@@ -12,8 +12,10 @@ class Character extends MovableObject {
   walkINTV;
   hurtTimeout = false;
   jumping = false;
-
+  throwingIterator = 0;
+  throwingBottle = false;
   collidingWith = {};
+  stopWalk = false;
   imgLinks = [
     //idle
     "img/2_character_pepe/1_idle/idle/I-1.png",
@@ -67,7 +69,7 @@ class Character extends MovableObject {
   //
   jump = () => {
     if (this.jumpingIterator % 10 === 0 && this.jumpingIterator > 0) {
-      this.jumping = false;
+      setTimeout(() => (this.jumping = false), 100);
       // this.pos_y = 250;
       this.jumpingIterator = 0;
 
@@ -84,24 +86,31 @@ class Character extends MovableObject {
   };
   airtime = () => {
     let curveInd = 5 - (this.jumpingIterator % 10);
-    console.log(curveInd <= 0 ? curveInd : curveInd - 1);
     return curveInd <= 0 ? curveInd * 17 : (curveInd - 1) * 17;
   };
   animate() {
     setInterval(() => {
       if (keyboard.left) {
         this.toLeft = true;
-        if (this.pos_x > 0) {
+        if (this.pos_x > this.world.camera_x * -1) {
           this.pos_x -= 5;
         }
       }
-      if (keyboard.right) {
+      if (keyboard.right && !this.stopWalk) {
         this.toLeft = false;
-        this.pos_x += 7;
+        this.pos_x += 5.5;
+        this.world.healthbar.pos_x += 5;
+        this.world.coinbar.pos_x += 5;
+        this.world.bottlebar.pos_x += 5;
         //this.moveWorld(true);
         this.movingWalk = true;
         this.world.camera_x -= 5;
+        if (this.world.camera_x < canvasWidth * -1.9) {
+          this.stopWalk = true;
+        }
         // this.world.ctx.translate(-5, 0);
+      } else if (keyboard.right) {
+        this.pos_x += 4;
       }
       if (keyboard.spacebar) {
         if (this.jumping === false) {
@@ -117,6 +126,9 @@ class Character extends MovableObject {
       if (!keyboard.right) {
         this.movingWalk = false;
       }
+      if (keyboard.f) {
+        this.throwBottle();
+      }
       this.chicken();
     }, 1000 / 60);
     /////////////
@@ -125,7 +137,7 @@ class Character extends MovableObject {
 
     // walking
     setInterval(() => {
-      if ((keyboard.right || keyboard.left) && this.jumping === false) {
+      if ((keyboard.right || keyboard.left) && this.pos_y === 235) {
         this.img = this.imageCache[this.imgLinksWalk[this.movingIterator % 6]];
         this.movingIterator++;
       }
@@ -155,21 +167,108 @@ class Character extends MovableObject {
       // );
       this.checkAndSplice(this.world.coins, this.collidingWith.id);
       this.collidingWith = null;
+      this.world.coinsCollected++;
+      if (this.world.coinsCollected % 3 === 0) {
+        this.world.coinbar.incPercentage();
+      }
     }
     // console.log(this.collidingWith instanceof Chicken);
     else if (this.collidingWith instanceof Chicken) {
-      console.log(this.collidingWith instanceof Chicken);
-      if (!this.hurtTimeout && !this.jumping) {
-        this.checkAndSplice(this.world.enemies, this.collidingWith.id);
+      if (
+        !this.hurtTimeout &&
+        !this.jumping &&
+        this.collidingWith.dead === false
+      ) {
         this.hurtTimeout = true;
         this.world.healthbar.decPercentage();
         // setTimeout(() => (this.collidingWith = {}), 500);
         setTimeout(() => (this.hurtTimeout = false), 1500);
         // this.collidingWith = null;
+      } else if (this.jumping) {
+        // this.hurtTimeout = true;
+        this.collidingWith.die();
+        // setTimeout(() => (this.hurtTimeout = false), 1500);
+      }
+    } else if (this.collidingWith instanceof Bottle) {
+      this.checkAndSplice(this.world.bottles, this.collidingWith.id);
+      this.world.bottlesCollected++;
+      if (this.world.bottlesCollected % 3 === 0) {
+        this.world.bottlebar.incPercentage();
       }
     }
     this.collidingWith = null;
   };
+  throwBottle() {
+    if (this.world.bottlesCollected > 0 && this.throwingBottle === false) {
+      let thrownBottle = new Bottle();
+      thrownBottle.pos_x = this.pos_x;
+      thrownBottle.pos_y = this.pos_y + this.height / 2;
+      thrownBottle.setImage("img/6_salsa_bottle/salsa_bottle.png");
+      this.world.thrownBottle = thrownBottle;
+      this.animateBottle(this.world.thrownBottle);
+      this.rotateBottle();
+      if (this.world.bottlesCollected % 3 === 0) {
+        this.world.bottlebar.decPercentage();
+      }
+      if (this.world.bottlesCollected > 0) {
+        this.world.bottlesCollected--;
+      }
+    }
+  }
+  animateBottle = (bottle) => {
+    // console.log(bottle.pos_x, bottle.pos_y);
+    if (bottle.pos_y > canvasHeight || this.world.stopBottle) {
+      this.throwingIterator = 0;
+      this.throwingBottle = false;
+      this.world.thrownBottle = null;
+      bottle.pos_y = Number.POSITIVE_INFINITY;
+      this.world.stopBottle = false;
+      return;
+    } else {
+      this.throwingBottle = true;
+      setTimeout(() => {
+        this.throwingIterator++;
+        bottle.pos_x += 13 - Math.random() * 10;
+        bottle.pos_y += setY();
+        this.animateBottle(bottle);
+      }, 10);
+    }
+    let setY = () => {
+      let bottleTranslate = -20 + this.throwingIterator;
+      return bottleTranslate;
+    };
+  };
+  rotateBottle() {
+    let rotBottle = this.world.thrownBottle;
+    if (rotBottle) {
+      setInterval(() => {
+        rotBottle.setImage(
+          "img/6_salsa_bottle/bottle_rotation/1_bottle_rotation.png"
+        );
+        setTimeout(
+          () =>
+            rotBottle.setImage(
+              "img/6_salsa_bottle/bottle_rotation/2_bottle_rotation.png"
+            ),
+          50
+        );
+        setTimeout(
+          () =>
+            rotBottle.setImage(
+              "img/6_salsa_bottle/bottle_rotation/3_bottle_rotation.png"
+            ),
+          100
+        );
+        setTimeout(
+          () =>
+            rotBottle.setImage(
+              "img/6_salsa_bottle/bottle_rotation/4_bottle_rotation.png"
+            ),
+          150
+        );
+      }, 150);
+    }
+  }
   moveWorld(bool) {
     //   this.world.background.forEach((background) => {
     //     bool ? (background.pos_x -= 6) : (background.pos_x += 6);

@@ -1,7 +1,7 @@
 let canvas;
-let canvasHeight;
-let canvasWidth;
-let counter = 0;
+let world;
+console.log("now");
+//let counter;
 
 // let character = new Character(50, 250);
 // character.setImage("./img/2_character_pepe/1_idle/idle/I-8.png");
