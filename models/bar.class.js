@@ -12,7 +12,12 @@ class Bar extends DrawableObject {
     this.img = this.imageCache[this.parseLinkInc(this.img.src)];
   }
   decPercentage() {
-    this.img = this.imageCache[this.parseLinkDec(this.img.src)];
+    if (this.img.src.includes("/0.png")) {
+      return;
+    } else {
+      this.img = this.imageCache[this.parseLinkDec(this.img.src)];
+      world.character.animateHurt();
+    }
   }
   parseLinkInc(link) {
     let linkEnd = link.match(/[0-9]+.png/g);

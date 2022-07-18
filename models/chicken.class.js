@@ -1,10 +1,11 @@
 class Chicken extends MovableObject {
   constructor(x, y) {
-    let randX = 150 + Math.random() * 500;
+    let randX = 300 + Math.random() * 500;
 
     super(randX, 470, 70, 70);
 
-    this.setImage("./img/3_enemies_chicken/chicken_normal/1_walk/1_w.png");
+    this.setImage("img/3_enemies_chicken/chicken_normal/1_walk/1_w.png");
+    this.loadImages();
     this.walkLeft();
   }
   imgLinks = [
@@ -60,7 +61,6 @@ class Chicken extends MovableObject {
         this.moveLeft();
         //  console.log(intv);
       } else {
-        console.log("cleared: intervall: ");
         //clearInterval(intv);
         if (this.animateWalk) {
           clearInterval(this.animateWalk);

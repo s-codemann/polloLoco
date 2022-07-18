@@ -202,6 +202,7 @@ class World {
 
       element.width = element.width * -1;
     }
+
     this.ctx.drawImage(
       element.img,
       element.pos_x,

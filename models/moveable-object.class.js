@@ -18,10 +18,6 @@ class MovableObject extends DrawableObject {
     this.width = width;
   }
 
-  setImage(path) {
-    this.img = new Image();
-    this.img.src = path;
-  }
   // incCounter() {
   //   this.idCounter++;
   //   console.log(this.id);

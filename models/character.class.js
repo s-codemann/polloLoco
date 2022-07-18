@@ -6,16 +6,20 @@ class Character extends MovableObject {
     this.loadImages(this.imgLinks);
     this.imgLinksWalk = this.filterImageKeys("walk");
     this.imgLinksJump = this.filterImageKeys("jump");
+    this.imgLinksHurt = this.filterImageKeys("hurt");
+    this.imgLinksDead = this.filterImageKeys("dead");
     this.animate();
   }
   idle1 = "img/2_character_pepe/1_idle/idle/I-1.png";
   walkINTV;
+  moving = false;
   hurtTimeout = false;
   jumping = false;
   throwingIterator = 0;
   throwingBottle = false;
   collidingWith = {};
   stopWalk = false;
+
   imgLinks = [
     //idle
     "img/2_character_pepe/1_idle/idle/I-1.png",
@@ -67,14 +71,17 @@ class Character extends MovableObject {
   //
   //jumping
   //
+  defaultImg = "img/2_character_pepe/1_idle/idle/I-8.png";
   jump = () => {
     if (this.jumpingIterator % 10 === 0 && this.jumpingIterator > 0) {
       setTimeout(() => (this.jumping = false), 100);
       // this.pos_y = 250;
       this.jumpingIterator = 0;
+      this.moving = false;
 
       return;
     } else {
+      this.moving = true;
       this.jumping = true;
       setTimeout(() => {
         this.img = this.imageCache[this.imgLinksJump[this.jumpingIterator % 9]];
@@ -94,6 +101,7 @@ class Character extends MovableObject {
         this.toLeft = true;
         if (this.pos_x > this.world.camera_x * -1) {
           this.pos_x -= 5;
+          this.moving = true;
         }
       }
       if (keyboard.right && !this.stopWalk) {
@@ -105,12 +113,14 @@ class Character extends MovableObject {
         //this.moveWorld(true);
         this.movingWalk = true;
         this.world.camera_x -= 5;
-        if (this.world.camera_x < canvasWidth * -1.9) {
+        if (this.world.camera_x < canvasWidth * -1.7) {
           this.stopWalk = true;
         }
         // this.world.ctx.translate(-5, 0);
       } else if (keyboard.right) {
         this.pos_x += 4;
+        this.movingWalk = true;
+        this.moving = true;
       }
       if (keyboard.spacebar) {
         if (this.jumping === false) {
@@ -118,6 +128,7 @@ class Character extends MovableObject {
           //   this.imageCache[this.imgLinksJump[this.jumpingIterator % 9]];
           // this.jumpingIterator++;
           this.jump();
+          this.moving = true;
         }
       }
       if (!keyboard.left) {
@@ -137,9 +148,17 @@ class Character extends MovableObject {
 
     // walking
     setInterval(() => {
-      if ((keyboard.right || keyboard.left) && this.pos_y === 235) {
+      let defaultpos;
+      if (
+        (keyboard.right || keyboard.left) &&
+        this.pos_y === 235 &&
+        this.movingWalk
+      ) {
         this.img = this.imageCache[this.imgLinksWalk[this.movingIterator % 6]];
         this.movingIterator++;
+      }
+      if (!this.moving) {
+        this.setStandard();
       }
     }, 70);
   }
@@ -267,6 +286,17 @@ class Character extends MovableObject {
           150
         );
       }, 150);
+    }
+  }
+  animateHurt() {
+    if (this.iterator >= this.imgLinksHurt.length) {
+      this.iterator = 0;
+      this.setStandard();
+      return;
+    } else {
+      this.img = this.imageCache[this.imgLinksHurt[this.iterator]];
+      this.iterator++;
+      setTimeout(() => this.animateHurt(), 150);
     }
   }
   moveWorld(bool) {
