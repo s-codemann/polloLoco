@@ -5,6 +5,7 @@ class Chicken extends MovableObject {
     super(randX, 470, 70, 70);
 
     this.setImage("img/3_enemies_chicken/chicken_normal/1_walk/1_w.png");
+    this.startWalk();
     this.loadImages();
     this.walkLeft();
   }
@@ -13,6 +14,7 @@ class Chicken extends MovableObject {
     "img/3_enemies_chicken/chicken_normal/1_walk/2_w.png",
     "img/3_enemies_chicken/chicken_normal/1_walk/3_w.png",
   ];
+  animateWalk;
   walkingSpeed = 0.4 + Math.random() * 6;
   dead = false;
   moveRight() {
@@ -20,6 +22,7 @@ class Chicken extends MovableObject {
   }
   die() {
     this.dead = true;
+    chicken_dead.play();
     setTimeout(
       () =>
         this.setImage("img/3_enemies_chicken/chicken_normal/2_dead/dead.png"),
@@ -30,31 +33,38 @@ class Chicken extends MovableObject {
 
   moveRight() {}
   moveLeft() {
-    this.pos_x -= this.walkingSpeed;
+    if (world.gameStarted) {
+      this.pos_x -= this.walkingSpeed;
+    }
   }
   walkInts = [];
-  animateWalk = setInterval(() => {
-    let one;
-    let two;
-    let three;
-    if (!this.dead)
-      one = setTimeout(
-        () => (this.img = this.imageCache[this.imgLinks[0]]),
-        100
+  startWalk = () => {
+    this.animateWalk = setInterval(() => {
+      let one;
+      let two;
+      let three;
+      if (!this.dead)
+        one = setTimeout(
+          () => (this.img = this.imageCache[this.imgLinks[0]]),
+          100
+        );
+      two = setTimeout(
+        () => (this.img = this.imageCache[this.imgLinks[1]]),
+        200
       );
-    two = setTimeout(() => (this.img = this.imageCache[this.imgLinks[1]]), 200);
-    three = setTimeout(
-      () => (this.img = this.imageCache[this.imgLinks[2]]),
-      300
-    );
-    this.walkInts.push(one, two, three);
+      three = setTimeout(
+        () => (this.img = this.imageCache[this.imgLinks[2]]),
+        300
+      );
+      this.walkInts.push(one, two, three);
 
-    // if (this.dead) {
-    //   clearTimeout(one);
-    //   clearTimeout(two);
-    //   clearTimeout(three);
-    // }
-  }, 300);
+      // if (this.dead) {
+      //   clearTimeout(one);
+      //   clearTimeout(two);
+      //   clearTimeout(three);
+      // }
+    }, 300);
+  };
   walkLeft() {
     setInterval(() => {
       if (!this.dead) {

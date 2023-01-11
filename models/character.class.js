@@ -10,6 +10,7 @@ class Character extends MovableObject {
     this.imgLinksDead = this.filterImageKeys("dead");
     this.animate();
   }
+  health = 100;
   idle1 = "img/2_character_pepe/1_idle/idle/I-1.png";
   walkINTV;
   moving = false;
@@ -19,7 +20,9 @@ class Character extends MovableObject {
   throwingBottle = false;
   collidingWith = {};
   stopWalk = false;
-
+  hurting = false;
+  dying = false;
+  dead = false;
   imgLinks = [
     //idle
     "img/2_character_pepe/1_idle/idle/I-1.png",
@@ -77,7 +80,6 @@ class Character extends MovableObject {
       setTimeout(() => (this.jumping = false), 100);
       // this.pos_y = 250;
       this.jumpingIterator = 0;
-      this.moving = false;
 
       return;
     } else {
@@ -97,19 +99,19 @@ class Character extends MovableObject {
   };
   animate() {
     setInterval(() => {
-      if (keyboard.left) {
+      if (keyboard.left && !this.dead) {
         this.toLeft = true;
         if (this.pos_x > this.world.camera_x * -1) {
           this.pos_x -= 5;
           this.moving = true;
+          this.movingWalk = true;
         }
-      }
-      if (keyboard.right && !this.stopWalk) {
+      } else if (keyboard.right && !this.stopWalk && !this.dead) {
         this.toLeft = false;
         this.pos_x += 5.5;
-        this.world.healthbar.pos_x += 5;
-        this.world.coinbar.pos_x += 5;
-        this.world.bottlebar.pos_x += 5;
+        this.world.healthbar.pos_x = -1 * this.world.camera_x + 20;
+        this.world.coinbar.pos_x = -1 * this.world.camera_x + 20;
+        this.world.bottlebar.pos_x = -1 * this.world.camera_x + 20;
         //this.moveWorld(true);
         this.movingWalk = true;
         this.world.camera_x -= 5;
@@ -117,30 +119,39 @@ class Character extends MovableObject {
           this.stopWalk = true;
         }
         // this.world.ctx.translate(-5, 0);
-      } else if (keyboard.right) {
+      } else if (keyboard.right && !this.dead) {
         this.pos_x += 4;
         this.movingWalk = true;
         this.moving = true;
       }
-      if (keyboard.spacebar) {
+      if (keyboard.spacebar && !this.dead) {
         if (this.jumping === false) {
           // this.img =
           //   this.imageCache[this.imgLinksJump[this.jumpingIterator % 9]];
           // this.jumpingIterator++;
+          jump.play();
           this.jump();
           this.moving = true;
         }
-      }
-      if (!keyboard.left) {
+      } else if (!keyboard.left) {
         this.toLeft = false;
-      }
-      if (!keyboard.right) {
+      } else if (!keyboard.right) {
         this.movingWalk = false;
       }
       if (keyboard.f) {
         this.throwBottle();
       }
       this.chicken();
+      if (
+        !keyboard.left &&
+        !keyboard.right &&
+        !this.throwingBottle &&
+        !this.jumping &&
+        !this.hurting &&
+        !this.dying
+      ) {
+        this.moving = false;
+      } else this.moving = true;
     }, 1000 / 60);
     /////////////
     //jumping
@@ -148,16 +159,17 @@ class Character extends MovableObject {
 
     // walking
     setInterval(() => {
-      let defaultpos;
+      walking.pause();
       if (
         (keyboard.right || keyboard.left) &&
         this.pos_y === 235 &&
-        this.movingWalk
+        !this.hurting &&
+        !this.dead
       ) {
         this.img = this.imageCache[this.imgLinksWalk[this.movingIterator % 6]];
         this.movingIterator++;
-      }
-      if (!this.moving) {
+        walking.play();
+      } else if (!this.moving) {
         this.setStandard();
       }
     }, 70);
@@ -165,34 +177,33 @@ class Character extends MovableObject {
   //
   //
   chicken = () => {
-    //console.log(this.world.checkforCollisionElements);
-    // console.log(this.collidingWith);
     // if (this.collidingWith) {
-    //   console.log(
-    //     "chicken:",
     //     this.collidingWith instanceof Chicken,
     //     "coin:",
     //     this.collidingWith instanceof Coin
     //   );
     // }
-    //console.log(this.collidingWith.id);
-    // console.log(
     //   this.collidingWith instanceof Coin,
     //   this.collidingWith instanceof Chicken
     // );
     if (this.collidingWith instanceof Coin) {
       // world.coins.forEach((coin, index) =>
-      //   console.log(index, coin.id, this.collidingWith.id)
       // );
       this.checkAndSplice(this.world.coins, this.collidingWith.id);
       this.collidingWith = null;
       this.world.coinsCollected++;
       if (this.world.coinsCollected % 3 === 0) {
         this.world.coinbar.incPercentage();
+
+        coin.play();
       }
-    }
-    // console.log(this.collidingWith instanceof Chicken);
-    else if (this.collidingWith instanceof Chicken) {
+    } else if (this.collidingWith instanceof Chicken && !this.dead) {
+      console.log(
+        this.collidingWith instanceof Chicken,
+        this.collidingWith instanceof Boss,
+        this.pos_x,
+        this.world.enemies.find((enemy) => enemy instanceof Boss).pos_x
+      );
       if (
         !this.hurtTimeout &&
         !this.jumping &&
@@ -200,6 +211,18 @@ class Character extends MovableObject {
       ) {
         this.hurtTimeout = true;
         this.world.healthbar.decPercentage();
+        this.health -= 20;
+        if (this.health <= 0) {
+          gameOver("img/9_intro_outro_screens/game_over/you lost.png");
+          this.animateDead();
+          char_dead.play();
+        }
+
+        if (this.health > 0) {
+          char_hurt.play();
+          this.animateHurt();
+        }
+        // setTimeout(() => this.setStandard(), 400);
         // setTimeout(() => (this.collidingWith = {}), 500);
         setTimeout(() => (this.hurtTimeout = false), 1500);
         // this.collidingWith = null;
@@ -235,7 +258,6 @@ class Character extends MovableObject {
     }
   }
   animateBottle = (bottle) => {
-    // console.log(bottle.pos_x, bottle.pos_y);
     if (bottle.pos_y > canvasHeight || this.world.stopBottle) {
       this.throwingIterator = 0;
       this.throwingBottle = false;
@@ -289,14 +311,28 @@ class Character extends MovableObject {
     }
   }
   animateHurt() {
+    this.hurting = true;
     if (this.iterator >= this.imgLinksHurt.length) {
       this.iterator = 0;
-      this.setStandard();
+      this.hurting = false;
+
       return;
     } else {
       this.img = this.imageCache[this.imgLinksHurt[this.iterator]];
       this.iterator++;
       setTimeout(() => this.animateHurt(), 150);
+    }
+  }
+  animateDead() {
+    this.dying = true;
+    if (this.iterator >= this.imgLinksDead.length) {
+      this.iterator = 0;
+      this.dead = true;
+      return;
+    } else {
+      this.img = this.imageCache[this.imgLinksDead[this.iterator]];
+      this.iterator++;
+      setTimeout(() => this.animateDead(), 150);
     }
   }
   moveWorld(bool) {

@@ -1,8 +1,8 @@
 class World {
   character = new Character();
-
-  level = level0;
-  enemies = this.level.enemies;
+  gameStarted = false;
+  level;
+  enemies = [];
   canvas;
   ctx;
   clouds = new Clouds();
@@ -13,7 +13,7 @@ class World {
   stopBottle = false;
   fixedBackground = [new FullBackground("./img/5_background/layers/air.png")];
   camera_x = -5;
-  background = this.level.background;
+  background = [];
   bottles = [
     new Bottle(),
     new Bottle(),
@@ -51,11 +51,13 @@ class World {
   coinsCollected = 0;
   bottlesCollected = 1;
   constructor(canvas, character, enemies, clouds) {
+    console.log("hello from world");
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     // this.character = character;
     // this.enemies = enemies;
     // this.clouds = clouds;
+    this.setLevel(level0);
     this.setLevel(level1);
     this.setLevel(level2);
     this.character.world = this;
@@ -65,6 +67,7 @@ class World {
       .concat(this.bottles);
     this.checkCollision();
     this.draw();
+    // this.backup = JSON.parse(JSON.stringify(this));
   }
   setLevel = (level) => {
     this.level = level;
@@ -182,18 +185,18 @@ class World {
     elements.forEach((element) => this.addToMap(element));
   }
   addToMap(element) {
-    if (
-      element instanceof Character ||
-      element instanceof Chicken ||
-      element instanceof Coin
-    ) {
-      this.ctx.strokeRect(
-        element.pos_x,
-        element.pos_y,
-        element.width,
-        element.height
-      );
-    }
+    // if (
+    //   element instanceof Character ||
+    //   element instanceof Chicken ||
+    //   element instanceof Coin
+    // ) {
+    //   this.ctx.strokeRect(
+    //     element.pos_x,
+    //     element.pos_y,
+    //     element.width,
+    //     element.height
+    //   );
+    // }
     if (element.toLeft) {
       this.ctx.save();
       this.ctx.translate(element.pos_x * 2, 0);

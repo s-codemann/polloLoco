@@ -2,7 +2,110 @@ body {
   margin: 0;
   width: 100%;
   height: 100vh;
+  display: flex;
+  justify-content: center;
 }
-#game {
+
+canvas {
   background-color: black;
+  width: 80%;
+  height: 100%;
+  max-height: 100%;
+  position: relative;
+  z-index: 1;
+  scale: 0;
+}
+.game_over_div {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.492);
+}
+.game_over {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-name: game-over;
+  animation-duration: 400ms;
+  animation-fill-mode: forwards;
+}
+.score-div {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 5%;
+  height: 100px;
+  width: 500px;
+  background-color: rgba(75, 37, 37, 0.311);
+  border-radius: 30px;
+  z-index: 3;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+}
+.restart {
+  border-radius: 20%;
+  position: absolute;
+  right: 5%;
+  bottom: 10%;
+  transform: translateX(-50%);
+  z-index: 3;
+  height: 200px;
+  width: 200px;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 0, 0, 0.427),
+    rgb(165, 42, 42),
+    rgba(255, 0, 0, 0.186)
+  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: rgb(230, 255, 180);
+  font-size: 2rem;
+}
+.restart:hover {
+  background: linear-gradient(200deg, red, brown, red);
+}
+.start {
+  background-image: url("img/9_intro_outro_screens/start/startscreen_1.png");
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100%;
+  left: 5%;
+  /* transform: translateX(-50%); */
+}
+.start_btn {
+  position: absolute;
+  right: 50%;
+  bottom: 20%;
+  transform: translateX(50%);
+  color: white;
+  font-size: 2rem;
+  background-color: rgba(174, 124, 77, 0.629);
+  cursor: pointer;
+}
+@keyframes game-over {
+  0% {
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: scale(1), rotate(360deg);
+  }
+}
+@media (max-width: 1000px) {
+  #game {
+    width: 100%;
+  }
 }

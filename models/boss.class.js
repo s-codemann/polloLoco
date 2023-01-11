@@ -16,6 +16,9 @@ class Boss extends Chicken {
     this.imgLinksDead = this.filterImageKeys("dead");
     // this.imgHurt = this.filterImageKeys("hurt");
   }
+
+  atkIntv;
+  attack_set = false;
   charClose = false;
   alerted = false;
   lives = 4;
@@ -49,26 +52,31 @@ class Boss extends Chicken {
   ];
   imgLinksAlert;
   die() {
-    if (!this.dead) {
+    if (this.lives === 0) {
+      if (!this.dead) {
+        this.animateDead();
+        this.dead = true;
+        this.pos_y -= 100;
+        this.fall = setInterval(() => (this.pos_y += 4), 10);
+      
+      }
+      gameOver("win");
+    } else if (!this.dead) {
       this.lives--;
       this.animateHurt();
     }
-    if (this.lives === 0) {
-      this.animateDead();
-      this.dead = true;
-      this.pos_y -= 100;
-      setInterval(() => (this.pos_y += 4), 10);
-    }
   }
   blub = setInterval(() => {
-    this.isClose();
     this.animateAlert();
   }, 50);
+  blab = setInterval(() => this.isClose(), 50);
   isClose = () => {
-    if (this.pos_x - world.character.pos_x < 400) {
+    if (this.pos_x - world.character.pos_x < 500) {
       this.charClose = true;
-      console.log("close");
     }
+    if (world.character.dead || this.dead) {
+      clearInterval(this.atkIntv);
+    } //else this.charClose = false;
   };
   animateAlert() {
     if (this.iterator >= this.imgLinksAlert.length - 1 && this.alerted) {
@@ -76,6 +84,15 @@ class Boss extends Chicken {
       this.iterator = 0;
       return;
     } else if (this.charClose) {
+      if (!this.attack_set) {
+        this.attack_set = true;
+        this.atkIntv = setInterval(
+          () => this.attack(),
+          5000 + 4000 * Math.random()
+        );
+      }
+
+      boss_scream.play();
       this.alerted = true;
       clearInterval(this.blub);
       setTimeout(() => {
@@ -85,8 +102,26 @@ class Boss extends Chicken {
       }, 100);
     }
   }
+  attack = () => {
+    this.animateAttack();
+    boss_scream.play();
+    setTimeout(() => this.animateAttack(), 2000);
+    let baseX = this.pos_x;
+    let baseY = this.pos_y;
+    this.animateAttack();
+    setTimeout(() => {
+      let charge = setInterval(() => (this.pos_x -= 30), 10);
+      setTimeout(() => {
+        clearInterval(charge);
+        setTimeout(() => {
+          while (this.pos_x < baseX) {
+            this.pos_x += 30;
+          }
+        }, 1000);
+      }, 200);
+    }, 2600);
+  };
   animateAttack() {
-    console.log(this.img.src);
     if (this.iterator >= this.imgLinksAttack.length) {
       this.iterator = 0;
       return;
@@ -95,12 +130,10 @@ class Boss extends Chicken {
         this.img = this.imageCache[this.imgLinksAttack[this.iterator]];
         this.iterator++;
         this.animateAttack();
-        console.log(this.img.src);
       }, 150);
     }
   }
   animateHurt() {
-    console.log(this.img.src);
     if (this.iterator >= this.imgLinksHurt.length) {
       this.iterator = 0;
       return;
@@ -109,12 +142,10 @@ class Boss extends Chicken {
         this.img = this.imageCache[this.imgLinksHurt[this.iterator]];
         this.iterator++;
         this.animateHurt();
-        console.log(this.img.src);
       }, 150);
     }
   }
   animateDead() {
-    console.log(this.img.src);
     if (this.iterator >= this.imgLinksDead.length) {
       this.iterator = 0;
       return;
@@ -123,7 +154,6 @@ class Boss extends Chicken {
         this.img = this.imageCache[this.imgLinksDead[this.iterator]];
         this.iterator++;
         this.animateDead();
-        console.log(this.img.src);
       }, 200);
     }
   }
