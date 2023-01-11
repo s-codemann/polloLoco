@@ -7,6 +7,7 @@ class Healthbar extends Bar {
     this.loadImages();
   }
   name = "health";
+  defaultImg = "img/7_statusbars/1_statusbar/2_statusbar_health/blue/100.png";
   imgLinks = [
     "img/7_statusbars/1_statusbar/2_statusbar_health/orange/0.png",
     "img/7_statusbars/1_statusbar/2_statusbar_health/orange/20.png",

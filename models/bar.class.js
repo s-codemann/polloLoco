@@ -9,10 +9,19 @@ class Bar extends DrawableObject {
 
   incPercentage() {
     // console.log(this.parseLinkDec(this.img.src));
-    this.img = this.imageCache[this.parseLinkInc(this.img.src)];
+    if (this.img.src.includes("/100.png")) {
+      return;
+    } else this.img = this.imageCache[this.parseLinkInc(this.img.src)];
   }
   decPercentage() {
-    this.img = this.imageCache[this.parseLinkDec(this.img.src)];
+    if (this.img.src.includes("/0.png")) {
+      return;
+    } else {
+      this.img = this.imageCache[this.parseLinkDec(this.img.src)];
+    }
+  }
+  toStart() {
+    this.pos_x = 20;
   }
   parseLinkInc(link) {
     let linkEnd = link.match(/[0-9]+.png/g);

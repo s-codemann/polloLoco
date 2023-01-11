@@ -7,10 +7,14 @@ class DrawableObject {
     this.loadImages(this.imgLinks);
     this.id = counter++;
   }
+  iterator = 0;
   setImage = (path) => {
     this.img = new Image();
     this.img.src = path;
   };
+  setStandard() {
+    this.img = this.imageCache[this.defaultImg];
+  }
   imageCache = {};
   filterImageKeys(filter) {
     return Object.keys(this.imageCache).filter((key) => key.includes(filter));
@@ -25,14 +29,16 @@ class DrawableObject {
     // console.log(this);
   };
   checkAndSplice = (arr, id) => {
-    // console.log(arr[0].id)
+    console.log(id);
     let toSplice = arr.find((el) => el.id === id);
     if (toSplice) {
       arr.splice(
         arr.findIndex((el) => el.id === id),
         1
       );
-      world.checkforCollisionElements = world.enemies.concat(world.coins);
+      world.checkforCollisionElements = world.enemies
+        .concat(world.coins)
+        .concat(world.bottles);
     } else return;
   };
 }

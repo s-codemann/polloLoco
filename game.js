@@ -1,14 +1,18 @@
 let canvas;
-let canvasHeight;
-let canvasWidth;
-let counter = 0;
+let world;
+console.log("now");
+let backup;
+let chicken_alert = new Audio("audio/chicken-alert.wav");
+let chicken_dead = new Audio("audio/chicken-dead.wav");
+let coin = new Audio("audio/coin.wav");
+let jump = new Audio("audio/jump.wav");
+let walking = new Audio("audio/walk.wav");
+let char_hurt = new Audio("audio/char-hurt.wav");
+let char_dead = new Audio("audio/char-dead.wav");
+let boss_scream = new Audio("audio/boss-scream.wav");
+let firstCtx;
+let firstRun = true;
 
-// let character = new Character(50, 250);
-// character.setImage("./img/2_character_pepe/1_idle/idle/I-8.png");
-// let chicken1 = new Chicken();
-// let chicken2 = new Chicken();
-// let chicken3 = new Chicken();
-// let enemies = [chicken1, chicken2, chicken3];
 let ctx;
 let keyboard = new Keyboard();
 // clouds
@@ -58,10 +62,22 @@ window.addEventListener("keyup", (ev) => {
 function init() {
   console.log("initialising");
   canvas = document.getElementById("game");
+  canvascopy = document.createElement("canvas");
+
+  canvascopy.id = "game";
+  document.body.replaceChild(canvascopy, canvas);
+  canvascopy.setAttribute("height", "600");
+  canvascopy.setAttribute("width", "1000");
+  //canvascopy.style.display = "block";
+
+  canvas = canvascopy;
   canvasHeight = canvas.height;
   canvasWidth = canvas.width;
   ctx = canvas.getContext("2d");
+
+  ctx.save();
   world = new World(canvas);
+  //  backup = JSON.parse(JSON.stringify(world));
 }
 // character.addEventListener("load", init);
 

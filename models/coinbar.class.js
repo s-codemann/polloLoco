@@ -5,6 +5,7 @@ class Coinbar extends Bar {
     this.loadImages();
   }
   name = "coin";
+  defaultImg = "img/7_statusbars/1_statusbar/1_statusbar_coin/orange/0.png";
   imgLinks = [
     "img/7_statusbars/1_statusbar/1_statusbar_coin/orange/0.png",
     "img/7_statusbars/1_statusbar/1_statusbar_coin/orange/20.png",
