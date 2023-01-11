@@ -58,8 +58,8 @@ class Boss extends Chicken {
         this.dead = true;
         this.pos_y -= 100;
         this.fall = setInterval(() => (this.pos_y += 4), 10);
-      
       }
+      this.lives = 5;
       gameOver("win");
     } else if (!this.dead) {
       this.lives--;
