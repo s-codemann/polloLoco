@@ -14,8 +14,8 @@ canvas {
   max-height: 100%;
   position: relative;
   z-index: 1;
-  scale: 1;
 }
+
 .game_over_div {
   position: absolute;
   inset: 0;
@@ -31,6 +31,8 @@ canvas {
   animation-name: game-over;
   animation-duration: 400ms;
   animation-fill-mode: forwards;
+  height: 100%;
+  width: 100%;
 }
 .score-div {
   position: absolute;
@@ -76,12 +78,11 @@ canvas {
 .start {
   background-image: url("img/9_intro_outro_screens/start/startscreen_1.png");
   position: absolute;
-  inset: 0;
   z-index: 2;
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   width: 100%;
-  left: 5%;
+  height: 100%;
   /* transform: translateX(-50%); */
 }
 .start_btn {
@@ -99,6 +100,13 @@ canvas {
 .start_btn:hover {
   opacity: 1;
   background-color: rgba(212, 63, 21);
+}
+ul {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 22px;
+}
+li {
+  margin: 20px;
 }
 @keyframes game-over {
   0% {
