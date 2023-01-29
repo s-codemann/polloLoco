@@ -53,14 +53,15 @@ class Boss extends Chicken {
   imgLinksAlert;
   die() {
     if (this.lives === 0) {
-      if (!this.dead) {
+      this.dead = true;
+      world.over = true;
+      if (this.dead) {
+        this.dead = false;
         this.animateDead();
-        this.dead = true;
         this.pos_y -= 100;
         this.fall = setInterval(() => (this.pos_y += 4), 10);
+        gameOver("win");
       }
-      this.lives = 5;
-      gameOver("win");
     } else if (!this.dead) {
       this.lives--;
       this.animateHurt();

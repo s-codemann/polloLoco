@@ -8,6 +8,8 @@ class Chicken extends MovableObject {
     this.startWalk();
     this.loadImages();
     this.walkLeft();
+
+    console.log("newchick");
   }
   imgLinks = [
     "img/3_enemies_chicken/chicken_normal/1_walk/1_w.png",

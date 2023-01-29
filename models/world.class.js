@@ -1,8 +1,8 @@
 class World {
-  character = new Character();
+  character;
   gameStarted = false;
   level;
-  enemies = [];
+  enemies;
   canvas;
   ctx;
   clouds = new Clouds();
@@ -14,6 +14,7 @@ class World {
   fixedBackground = [new FullBackground("./img/5_background/layers/air.png")];
   camera_x = -5;
   background = [];
+  over;
   bottles = [
     new Bottle(),
     new Bottle(),
@@ -51,27 +52,34 @@ class World {
   coinsCollected = 0;
   bottlesCollected = 1;
   constructor(canvas, character, enemies, clouds) {
+    this.over = false;
+    // this.gameStarted = true;
     console.log("hello from world");
-    this.canvas = canvas;
-    this.ctx = canvas.getContext("2d");
-    // this.character = character;
-    // this.enemies = enemies;
-    // this.clouds = clouds;
-    this.setLevel(level0);
-    this.setLevel(level1);
-    this.setLevel(level2);
+    this.enemies = [];
+
+    this.bottlebar = new Bottlebar();
+    this.healthbar = new Healthbar();
+    this.coinbar = new Coinbar();
+    this.setLevel(new level0());
+    this.setLevel(new level1());
+    this.setLevel(new level2());
+    this.setLevel(new level3());
+
+    this.character = new Character();
     this.character.world = this;
 
     this.checkforCollisionElements = this.enemies
       .concat(this.coins)
       .concat(this.bottles);
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d");
     this.checkCollision();
     this.draw();
     // this.backup = JSON.parse(JSON.stringify(this));
   }
   setLevel = (level) => {
     this.level = level;
-    this.enemies = this.enemies.concat(this.level.enemies);
+    this.enemies = this.enemies.concat(level.enemies);
     this.background = this.background.concat(this.level.background);
   };
   // checkforCollisionElements = this.enemies

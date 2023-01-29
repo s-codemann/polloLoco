@@ -15,5 +15,6 @@ function startScreen() {
 function initGame() {
   world.gameStarted = true;
   document.body.removeChild(startScreenEl);
+
   restartGame();
 }

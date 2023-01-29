@@ -112,7 +112,6 @@ class Character extends MovableObject {
         this.world.healthbar.pos_x = -1 * this.world.camera_x + 20;
         this.world.coinbar.pos_x = -1 * this.world.camera_x + 20;
         this.world.bottlebar.pos_x = -1 * this.world.camera_x + 20;
-        //this.moveWorld(true);
         this.movingWalk = true;
         this.world.camera_x -= 5;
         if (this.world.camera_x < canvasWidth * -1.7) {
@@ -334,22 +333,5 @@ class Character extends MovableObject {
       this.iterator++;
       setTimeout(() => this.animateDead(), 150);
     }
-  }
-  moveWorld(bool) {
-    //   this.world.background.forEach((background) => {
-    //     bool ? (background.pos_x -= 6) : (background.pos_x += 6);
-    //   });
-    // Object.keys(world).forEach((key) => {
-    //   if (
-    //     // key !== "character" &&
-    //     key !== "fixedBackground" &&
-    //     key !== "canvas" &&
-    //     typeof world[key] === "object"
-    //   ) {
-    //     Array.isArray(world[key])
-    //       ? world[key].forEach((obj) => (obj.pos_x -= 5))
-    //       : (world[key].pos_x -= 5);
-    //   }
-    // });
   }
 }

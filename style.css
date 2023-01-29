@@ -4,6 +4,7 @@ body {
   height: 100vh;
   display: flex;
   justify-content: center;
+  background-color: #1a1a1a;
 }
 
 canvas {
@@ -13,7 +14,7 @@ canvas {
   max-height: 100%;
   position: relative;
   z-index: 1;
-  scale: 0;
+  scale: 1;
 }
 .game_over_div {
   position: absolute;
@@ -90,8 +91,14 @@ canvas {
   transform: translateX(50%);
   color: white;
   font-size: 2rem;
-  background-color: rgba(174, 124, 77, 0.629);
+  background-color: rgba(212, 63, 21, 0.853);
   cursor: pointer;
+  padding: 50px;
+  border-radius: 20px;
+}
+.start_btn:hover {
+  opacity: 1;
+  background-color: rgba(212, 63, 21);
 }
 @keyframes game-over {
   0% {
